@@ -1,4 +1,11 @@
+// Im statischen Modus (GitHub Pages) läuft die API im Browser, sonst auf dem Server.
+export const STATIC = import.meta.env.VITE_STATIC === 'true';
+
+let staticBackend;
+const backend = () => (staticBackend ??= import('./static/backend.js'));
+
 async function request(method, url, body) {
+  if (STATIC) return (await backend()).handle(method, url, body);
   const opts = { method, headers: {} };
   if (body instanceof FormData) opts.body = body;
   else if (body !== undefined) {
@@ -21,3 +28,19 @@ export const api = {
 
 let configPromise;
 export const getConfig = () => (configPromise ??= api.get('/config').catch(() => ({})));
+
+/** Props für einen Link auf ein Dokument (Ansehen oder Herunterladen) */
+export function docLinkProps(id, download = false) {
+  if (!STATIC) return { href: `/api/documents/${id}/file${download ? '?download=1' : ''}`, target: download ? undefined : '_blank', rel: 'noreferrer' };
+  return {
+    href: '#',
+    onClick: (e) => {
+      e.preventDefault();
+      backend().then((b) => b.openDocument(id, download));
+    },
+  };
+}
+
+export async function resetDemoData() {
+  if (STATIC) await (await backend()).resetStaticData();
+}

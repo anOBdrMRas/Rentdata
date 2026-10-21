@@ -98,3 +98,20 @@ test('Demodaten Straubing', async () => {
     server.close();
   }
 });
+
+test('Passwortschutz', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rentdata-'));
+  const app = createApp(openDb(':memory:'), { uploadDir: dir, auth: { user: 'admin', password: 'geheim' } });
+  const server = await new Promise((r) => { const s = app.listen(0, () => r(s)); });
+  const base = `http://127.0.0.1:${server.address().port}`;
+  try {
+    assert.equal((await fetch(base + '/api/buildings')).status, 401);
+    assert.equal((await fetch(base + '/healthz')).status, 200);
+    const bad = 'Basic ' + Buffer.from('admin:falsch').toString('base64');
+    assert.equal((await fetch(base + '/api/buildings', { headers: { Authorization: bad } })).status, 401);
+    const ok = 'Basic ' + Buffer.from('admin:geheim').toString('base64');
+    assert.equal((await fetch(base + '/api/buildings', { headers: { Authorization: ok } })).status, 200);
+  } finally {
+    server.close();
+  }
+});

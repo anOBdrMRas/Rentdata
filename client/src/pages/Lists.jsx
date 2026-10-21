@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { docLinkProps } from '../api.js';
 import { useData, Loading, Empty, StatusBadge } from '../components/ui.jsx';
 import { money, date, bytes } from '../format.js';
 import { OPTIONS, label } from '../schema.js';
@@ -83,7 +84,7 @@ export function DocumentsPage() {
             <tbody>
               {list.map((d) => (
                 <tr key={d.id}>
-                  <td><a href={`/api/documents/${d.id}/file`} target="_blank" rel="noreferrer"><b>{d.title || d.original_name}</b></a></td>
+                  <td><a {...docLinkProps(d.id)}><b>{d.title || d.original_name}</b></a></td>
                   <td>{label('doc_category', d.category)}</td>
                   <td><Link to={target(d) + '?tab=dokumente'}>{d.building_name}{d.unit_name ? ' · ' + d.unit_name : ''}</Link></td>
                   <td>{date(d.uploaded_at?.slice(0, 10))}</td>

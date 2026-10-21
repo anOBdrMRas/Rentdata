@@ -64,9 +64,34 @@ function pick(table, body, partial = false) {
   return out;
 }
 
-export function createApp(db, { uploadDir, googleMapsApiKey = '' } = {}) {
+function safeEqual(a, b) {
+  const x = crypto.createHash('sha256').update(String(a)).digest();
+  const y = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(x, y);
+}
+
+/** Einfacher Passwortschutz (HTTP Basic Auth), aktiv wenn ein Passwort gesetzt ist. */
+function basicAuth({ user, password }) {
+  return (req, res, next) => {
+    const [scheme, encoded] = (req.headers.authorization || '').split(' ');
+    if (scheme === 'Basic' && encoded) {
+      const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+      const i = decoded.indexOf(':');
+      if (i >= 0 && safeEqual(decoded.slice(0, i), user) && safeEqual(decoded.slice(i + 1), password)) return next();
+    }
+    res.setHeader('WWW-Authenticate', 'Basic realm="Rentdata", charset="UTF-8"');
+    res.status(401).send('Anmeldung erforderlich');
+  };
+}
+
+export function createApp(db, { uploadDir, googleMapsApiKey = '', auth = null } = {}) {
   fs.mkdirSync(uploadDir, { recursive: true });
   const app = express();
+  app.disable('x-powered-by');
+  app.set('trust proxy', true);
+  // Health-Check für Hoster/Docker – ohne Anmeldung erreichbar
+  app.get('/healthz', (req, res) => res.json({ ok: true }));
+  if (auth?.password) app.use(basicAuth({ user: auth.user || 'admin', password: auth.password }));
   app.use(express.json({ limit: '2mb' }));
 
   const get = (table, id) => {

@@ -1,0 +1,15 @@
+# Start auf eigenem Server/NAS:  docker compose up -d
+services:
+  rentdata:
+    image: ghcr.io/anobdrmras/rentdata:latest
+    # alternativ lokal bauen:  build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      APP_USER: admin
+      APP_PASSWORD: bitte-aendern
+      GOOGLE_MAPS_API_KEY: ""
+      DEMO_DATA: "true"
+    volumes:
+      - ./data:/data

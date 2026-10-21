@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../api.js';
+import { api, docLinkProps } from '../api.js';
 import { money, date, bytes, number } from '../format.js';
 import { label, OPTIONS } from '../schema.js';
 import EntityForm from './EntityForm.jsx';
@@ -327,7 +327,7 @@ export function DocumentsPanel({ documents, scope, units, onChange, showUnit }) 
               {documents.map((d) => (
                 <tr key={d.id}>
                   <td>
-                    <a href={`/api/documents/${d.id}/file`} target="_blank" rel="noreferrer"><b>{d.title || d.original_name}</b></a>
+                    <a {...docLinkProps(d.id)}><b>{d.title || d.original_name}</b></a>
                     {d.title && <div className="small muted">{d.original_name}</div>}
                   </td>
                   <td>{label('doc_category', d.category)}</td>
@@ -335,7 +335,7 @@ export function DocumentsPanel({ documents, scope, units, onChange, showUnit }) 
                   <td>{date(d.uploaded_at?.slice(0, 10))}</td>
                   <td className="num">{bytes(d.size || 0)}</td>
                   <td className="num">
-                    <a className="btn sm ghost" href={`/api/documents/${d.id}/file?download=1`}>⬇</a>
+                    <a className="btn sm ghost" {...docLinkProps(d.id, true)} title="Herunterladen">⬇</a>
                     <button className="btn sm ghost danger" onClick={async () => (await confirmDelete('Dokument', () => api.del('/documents/' + d.id))) && onChange()}>✕</button>
                   </td>
                 </tr>

@@ -1,0 +1,50 @@
+name: GitHub Pages (Prototyp)
+
+# Baut die statische Prototyp-Version (läuft komplett im Browser, Demodaten Straubing)
+# und veröffentlicht sie auf GitHub Pages.
+# Einmalig nötig: Settings → Pages → Build and deployment → Source: „GitHub Actions“.
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:static
+        env:
+          # Optional: Google-Maps-Key als Repository-Secret hinterlegen (im Browser sichtbar,
+          # daher in der Google Cloud Console auf die Pages-Adresse beschränken!)
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    # Veröffentlicht wird nur vom Standard-Branch des Repositorys
+    if: github.ref_name == github.event.repository.default_branch
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -24,6 +24,37 @@ Hausnummern und Zahlen sind erfunden.
 
 Für die Entwicklung (automatisches Neuladen): `npm run dev` → http://localhost:5173
 
+## Online stellen
+
+### Variante A: Prototyp auf GitHub Pages (kostenlos, ohne Server)
+
+Die App gibt es auch als **statische Version**, die komplett im Browser läuft: Demodaten sind
+eingebaut, Änderungen werden im Browser (localStorage) gespeichert. Ideal zum Ausprobieren und
+Zeigen – aber: jeder Besucher hat seine eigenen Daten, nichts wird zentral gespeichert,
+Dokumente max. 2 MB.
+
+1. Auf GitHub: **Settings → Pages → Build and deployment → Source: „GitHub Actions“** (einmalig).
+2. Bei jedem Push auf den Standard-Branch baut der Workflow `.github/workflows/pages.yml` die
+   Seite und veröffentlicht sie unter `https://<benutzer>.github.io/Rentdata/`.
+3. Optional Google Maps: Repository-Secret `GOOGLE_MAPS_API_KEY` anlegen
+   (Settings → Secrets and variables → Actions). Der Key ist im Browser sichtbar – in der Google
+   Cloud Console unbedingt auf die Pages-Adresse beschränken.
+
+Lokal testen: `npm run preview:static` → http://localhost:4173
+
+### Variante B: Vollversion mit Server (Docker)
+
+Der Workflow `.github/workflows/ci.yml` testet bei jedem Push, baut die App und veröffentlicht ein
+Docker-Image unter `ghcr.io/anobdrmras/rentdata`. Starten z. B. auf eigenem Server/NAS:
+
+```bash
+docker compose up -d      # siehe docker-compose.yml, Daten landen in ./data
+```
+
+Das Image läuft auch bei Hostern wie Fly.io, Railway oder Render (persistentes Volume für `/data`
+nötig). Für automatisches Deployment kann ein Deploy-Hook als Secret `DEPLOY_HOOK_URL` hinterlegt
+werden. **Im Internet immer `APP_PASSWORD` setzen** (Passwortschutz, Benutzer über `APP_USER`).
+
 ## Google Maps
 
 Ohne Konfiguration nutzt die Karte **OpenStreetMap** (kostenlos, kein Key nötig).
@@ -72,5 +103,5 @@ Der Key wird auch für „📍 Aus Adresse ermitteln“ (Adresse → Koordinaten
   einfach diesen Ordner sichern. Speicherort änderbar über `DATA_DIR`.
 - Tests: `npm test`
 
-Hinweis: Die App hat keine Benutzeranmeldung. Sie ist für den Betrieb auf dem eigenen Rechner
-bzw. im eigenen Netzwerk gedacht – nicht ungeschützt ins Internet stellen.
+Hinweis: Ohne `APP_PASSWORD` ist die Vollversion ohne Anmeldung erreichbar – das ist nur für den
+eigenen Rechner bzw. das Heimnetz gedacht.

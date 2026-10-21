@@ -16,7 +16,14 @@ if (empty && process.env.DEMO_DATA !== 'false') {
   console.log('Leere Datenbank – Demodaten (Straubing) wurden geladen.');
 }
 
-const app = createApp(db, { uploadDir: UPLOAD_DIR, googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '' });
+const app = createApp(db, {
+  uploadDir: UPLOAD_DIR,
+  googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
+  auth: process.env.APP_PASSWORD ? { user: process.env.APP_USER || 'admin', password: process.env.APP_PASSWORD } : null,
+});
+if (!process.env.APP_PASSWORD) {
+  console.warn('Hinweis: Kein APP_PASSWORD gesetzt – die App ist ohne Anmeldung erreichbar. Für den Betrieb im Internet unbedingt setzen!');
+}
 
 // Gebautes Frontend ausliefern (nach `npm run build`)
 const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../dist');
@@ -26,4 +33,4 @@ if (fs.existsSync(dist)) {
 }
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => console.log(`Rentdata läuft auf http://localhost:${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`Rentdata läuft auf http://localhost:${port}`));

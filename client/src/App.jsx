@@ -1,4 +1,5 @@
 import { NavLink, Route, Routes, Navigate } from 'react-router-dom';
+import { STATIC, resetDemoData } from './api.js';
 import Dashboard from './pages/Dashboard.jsx';
 import Buildings from './pages/Buildings.jsx';
 import BuildingDetail from './pages/BuildingDetail.jsx';
@@ -36,6 +37,16 @@ export default function App() {
         </nav>
       </aside>
       <main className="main">
+        {STATIC && (
+          <div className="proto-banner">
+            <span><b>Prototyp</b> – Daten werden nur in diesem Browser gespeichert.</span>
+            <button className="btn sm" onClick={async () => {
+              if (!window.confirm('Alle Änderungen verwerfen und die Demodaten neu laden?')) return;
+              await resetDemoData();
+              window.location.reload();
+            }}>Demodaten zurücksetzen</button>
+          </div>
+        )}
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/gebaeude" element={<Buildings />} />

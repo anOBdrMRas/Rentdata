@@ -222,3 +222,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
   .dl { grid-template-columns: 1fr; gap: 2px; }
   .dl dd { margin-bottom: 8px; }
 }
+
+.proto-banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between;
+  background: var(--warn-soft); color: var(--warn); border-radius: var(--radius); padding: 8px 12px; margin-bottom: 16px; font-size: 13px;
+}
