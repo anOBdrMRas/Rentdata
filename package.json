@@ -1,0 +1,44 @@
+{
+  "name": "rentdata",
+  "version": "1.0.0",
+  "description": "Verwaltung von Gebäuden und Mieteinheiten (privat & gewerblich)",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"node --watch server/index.js\" \"vite\"",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "seed": "node server/seed.js",
+    "test": "node --test test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anOBdrMRas/Rentdata.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anOBdrMRas/Rentdata/issues"
+  },
+  "homepage": "https://github.com/anOBdrMRas/Rentdata#readme",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "dotenv": "^18.0.8",
+    "express": "^4.22.3",
+    "multer": "^2.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "leaflet": "^1.9.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4",
+    "vite": "^8.3.5"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}
